@@ -1,0 +1,459 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #10161c;
+    --surface: #182028;
+    --surface-2: #1e2731;
+    --line: #2a3542;
+    --ink: #eef2f5;
+    --ink-dim: #9aa7b2;
+    --track: #2c8f6e;
+    --track-dim: #1f5f4a;
+    --time: #4f8fd6;
+    --time-dim: #315a86;
+    --fixed: #d69a3f;
+    --fixed-dim: #8a642a;
+    --other: #6c7a86;
+    --warn: #e6a23c;
+    --danger: #dd6b5b;
+    --ok: #3fb17e;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  body, .app{
+    margin:0; padding:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:14px; line-height:1.5;
+  }
+  .app{ padding:28px 20px 60px; max-width:760px; margin:0 auto; }
+  h1,h2,h3{ font-family:'Oswald',sans-serif; font-weight:600; letter-spacing:0.02em; margin:0; }
+  .mono{ font-family:'JetBrains Mono',monospace; }
+
+  .hero{ margin-bottom:28px; }
+  .hero .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em;
+    color:var(--track); text-transform:uppercase; margin-bottom:6px;
+  }
+  .hero h1{ font-size:30px; text-transform:uppercase; }
+  .hero p{ color:var(--ink-dim); margin-top:8px; max-width:46ch; }
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px; margin-bottom:16px;
+  }
+  .card h2{ font-size:15px; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:14px; color:var(--ink); }
+  .card h2 .sub{ font-family:'Inter',sans-serif; font-weight:400; text-transform:none; letter-spacing:0; color:var(--ink-dim); font-size:12px; display:block; margin-top:3px; }
+
+  /* form */
+  .form-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .field{ display:flex; flex-direction:column; gap:5px; flex:1; min-width:110px; }
+  .field label{ font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.05em; }
+  select, input{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:6px;
+    color:var(--ink); padding:9px 10px; font-size:14px; font-family:inherit; width:100%;
+  }
+  select:focus, input:focus{ outline:2px solid var(--track); outline-offset:1px; }
+  .btn{
+    background:var(--track); color:#0c1310; border:none; border-radius:6px;
+    padding:10px 18px; font-family:'Oswald',sans-serif; font-weight:600; letter-spacing:0.04em;
+    text-transform:uppercase; font-size:13px; cursor:pointer; margin-top:4px;
+  }
+  .btn:hover{ background:#379e7a; }
+  .btn.secondary{ background:transparent; color:var(--ink-dim); border:1px solid var(--line); }
+  .btn.secondary:hover{ color:var(--ink); border-color:var(--ink-dim); }
+  .btn.small{ padding:5px 10px; font-size:11px; }
+
+  /* legend */
+  .legend{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.04em; }
+  .swatch{ width:10px; height:10px; border-radius:2px; display:inline-block; }
+
+  /* week lane */
+  .week{ margin-bottom:16px; }
+  .week:last-child{ margin-bottom:0; }
+  .week-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+  .week-head .idx{ font-family:'JetBrains Mono',monospace; color:var(--ink-dim); font-size:12px; }
+  .week-head .idx b{ color:var(--ink); }
+  .week-head .total{ font-family:'Oswald',sans-serif; font-size:16px; }
+  .tag{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.05em; text-transform:uppercase;
+    padding:2px 7px; border-radius:20px; margin-left:8px; border:1px solid;
+  }
+  .tag.cutback{ color:var(--fixed); border-color:var(--fixed-dim); }
+  .lane{
+    height:22px; background:var(--surface-2); border-radius:6px; overflow:hidden; display:flex;
+    border:1px dashed transparent;
+  }
+  .lane.is-cutback{ border-color:var(--fixed-dim); }
+  .lane .seg{ height:100%; }
+  .seg.long{ background:var(--track); }
+  .seg.time{ background:var(--time); }
+  .seg.fixed{ background:var(--fixed); }
+  .seg.other{ background:var(--other); }
+  .flags{ margin-top:7px; display:flex; flex-direction:column; gap:4px; }
+  .flag{ font-size:12px; padding:6px 9px; border-radius:6px; border-left:3px solid; }
+  .flag.warn{ background:rgba(230,162,60,0.08); border-color:var(--warn); color:#f0c483; }
+  .flag.danger{ background:rgba(221,107,91,0.08); border-color:var(--danger); color:#f0a99b; }
+  .flag.ok{ background:rgba(63,177,126,0.08); border-color:var(--ok); color:#8fdcb6; }
+
+  /* next week */
+  .next-week{ border-color:var(--track-dim); background:linear-gradient(180deg, rgba(44,143,110,0.08), var(--surface)); }
+  .nw-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
+  .nw-item{ background:var(--surface-2); border-radius:8px; padding:12px; text-align:center; }
+  .nw-item .val{ font-family:'Oswald',sans-serif; font-size:22px; }
+  .nw-item .lbl{ font-size:10px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.06em; margin-top:2px; }
+  .nw-note{ font-size:12.5px; color:var(--ink-dim); border-top:1px solid var(--line); padding-top:10px; margin-top:2px; }
+
+  /* run list */
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  th{ text-align:left; color:var(--ink-dim); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; padding-bottom:8px; border-bottom:1px solid var(--line); }
+  td{ padding:8px 0; border-bottom:1px solid var(--line); }
+  td.num{ font-family:'JetBrains Mono',monospace; }
+  .type-pill{ font-size:10px; text-transform:uppercase; padding:2px 7px; border-radius:20px; letter-spacing:0.04em; }
+  .type-pill.long{ background:rgba(44,143,110,0.15); color:var(--track); }
+  .type-pill.time{ background:rgba(79,143,214,0.15); color:var(--time); }
+  .type-pill.fixed{ background:rgba(214,154,63,0.15); color:var(--fixed); }
+  .type-pill.other{ background:rgba(108,122,134,0.15); color:var(--other); }
+  .del{ background:none; border:none; color:var(--ink-dim); cursor:pointer; font-size:16px; padding:0 4px; }
+  .del:hover{ color:var(--danger); }
+  .empty{ color:var(--ink-dim); font-size:13px; padding:14px 0; text-align:center; }
+
+  @media (max-width:520px){
+    .nw-grid{ grid-template-columns:1fr; }
+    .form-row{ flex-direction:column; }
+  }
+</style>
+
+<div class="app" id="app"></div>
+
+<script>
+(function(){
+
+  // ---------- constants from the plan ----------
+  const CUTBACK_EVERY = 4;
+  const GROWTH_RATE = 0.10;
+  const CUTBACK_CUT = 0.75;
+  const LONG_PCT_CAP = 0.45;
+  const FIXED_CAP_KM = 5;
+  const TIME_CAP_MIN = 45;
+  const DEFAULT_PACE = 7.5; // min/km, used to convert a time-based run to a km-equivalent
+
+  let runs = [];
+  let editingPace = DEFAULT_PACE;
+
+  // ---------- storage ----------
+  async function loadRuns(){
+    try{
+      const res = await window.storage.get('runs', false);
+      runs = res && res.value ? JSON.parse(res.value) : [];
+    }catch(e){ runs = []; }
+    try{
+      const p = await window.storage.get('pace', false);
+      if(p && p.value) editingPace = parseFloat(p.value) || DEFAULT_PACE;
+    }catch(e){}
+    render();
+  }
+  async function saveRuns(){
+    try{ await window.storage.set('runs', JSON.stringify(runs), false); }
+    catch(e){ console.error('save failed', e); }
+  }
+  async function savePace(v){
+    editingPace = v;
+    try{ await window.storage.set('pace', String(v), false); }catch(e){}
+  }
+
+  // ---------- date / week helpers ----------
+  function getMonday(dateStr){
+    const d = new Date(dateStr + 'T00:00:00');
+    const day = d.getDay();
+    const diff = (day === 0 ? -6 : 1) - day;
+    d.setDate(d.getDate() + diff);
+    return d;
+  }
+  function weekKey(dateStr){ return getMonday(dateStr).toISOString().slice(0,10); }
+  function weekLabel(key){
+    const d = new Date(key + 'T00:00:00');
+    return d.toLocaleDateString('en-AU', { day:'numeric', month:'short' });
+  }
+  function kmEquivalent(run){
+    if(run.type === 'time'){
+      const pace = run.pace || DEFAULT_PACE;
+      return run.minutes / pace;
+    }
+    return run.km;
+  }
+
+  // ---------- weekly aggregation ----------
+  function buildWeeks(){
+    const map = {};
+    runs.forEach(r=>{
+      const k = weekKey(r.date);
+      if(!map[k]) map[k] = { key:k, runs:[] };
+      map[k].runs.push(r);
+    });
+    const weeks = Object.values(map).sort((a,b)=> a.key.localeCompare(b.key));
+    weeks.forEach((w, i)=>{
+      w.index = i+1;
+      w.long = 0; w.time = 0; w.fixed = 0; w.other = 0;
+      w.runs.forEach(r=>{
+        const km = kmEquivalent(r);
+        if(r.type==='long') w.long += km;
+        else if(r.type==='time') w.time += km;
+        else if(r.type==='fixed') w.fixed += km;
+        else w.other += km;
+      });
+      w.total = w.long + w.time + w.fixed + w.other;
+      w.longPct = w.total > 0 ? (w.long / w.total) * 100 : 0;
+    });
+    return weeks;
+  }
+
+  function analyseWeeks(weeks){
+    weeks.forEach((w, i)=>{
+      w.flags = [];
+      const isScheduledCutback = w.index % CUTBACK_EVERY === 0;
+      w.isScheduledCutback = isScheduledCutback;
+
+      const prev = i>0 ? weeks[i-1] : null;
+
+      if(isScheduledCutback){
+        if(prev && w.total >= prev.total * 0.9){
+          w.flags.push({level:'warn', text:"This is a scheduled cutback week (every 4th), but volume didn't drop much. Consider easing off ~25% to let things adapt."});
+        } else if(prev){
+          w.flags.push({level:'ok', text:'Cutback week — volume eased off as planned. Good.'});
+        }
+      } else if(prev){
+        const prevWasCutback = prev.isScheduledCutback;
+        const basis = (prevWasCutback && i>1) ? weeks[i-2].total : prev.total;
+        const growth = basis > 0 ? ((w.total - basis) / basis) * 100 : 0;
+        if(growth > 15){
+          w.flags.push({level:'danger', text:`Volume jumped ~${growth.toFixed(0)}% vs the last build week — well past the 10% guideline. Higher injury risk.`});
+        } else if(growth > 10.5){
+          w.flags.push({level:'warn', text:`Volume grew ~${growth.toFixed(0)}%, just over the 10% guideline. Not alarming, but keep an eye on it.`});
+        }
+      }
+
+      if(w.total > 0 && w.longPct > LONG_PCT_CAP*100){
+        w.flags.push({level:'warn', text:`Long run is ${w.longPct.toFixed(0)}% of this week's volume (guideline: under 45%). Consider growing the other two runs, or adding a 4th easy run.`});
+      }
+    });
+  }
+
+  function suggestNextWeek(weeks){
+    if(weeks.length === 0){
+      return { total:5, long:2, time:12, fixed:1.5, index:1, isCutback:false,
+        note:'No runs logged yet — this mirrors Week 1 of the plan. Log a run to get a live recommendation.' };
+    }
+    const last = weeks[weeks.length-1];
+    const prevBeforeLast = weeks.length>1 ? weeks[weeks.length-2] : null;
+    const nextIndex = last.index + 1;
+    const isCutback = nextIndex % CUTBACK_EVERY === 0;
+
+    const basis = (last.isScheduledCutback && prevBeforeLast) ? prevBeforeLast.total : last.total;
+    let suggestedTotal = isCutback ? last.total * CUTBACK_CUT : basis * (1+GROWTH_RATE);
+
+    // fixed run: crawl toward 5km cap, then hold
+    let suggestedFixed = last.fixed > 0 ? Math.min(FIXED_CAP_KM, last.fixed + 0.4) : Math.min(FIXED_CAP_KM, 1.5);
+    if(isCutback) suggestedFixed = Math.max(suggestedFixed * 0.85, Math.min(FIXED_CAP_KM, last.fixed || 1.5));
+
+    // time run: crawl toward 45 min cap, then hold
+    const lastTimeMin = last.runs.filter(r=>r.type==='time').reduce((s,r)=>s+r.minutes,0) / Math.max(1, last.runs.filter(r=>r.type==='time').length || 1);
+    let suggestedTimeMin = lastTimeMin > 0 ? Math.min(TIME_CAP_MIN, lastTimeMin + 2) : 15;
+    if(isCutback) suggestedTimeMin = Math.max(15, suggestedTimeMin - 4);
+    const suggestedTimeKm = suggestedTimeMin / editingPace;
+
+    // long run = remainder, capped at 45% of total
+    let suggestedLong = suggestedTotal - suggestedFixed - suggestedTimeKm;
+    let note = '';
+    const cap = suggestedTotal * LONG_PCT_CAP;
+    if(suggestedLong > cap){
+      note = `Long run would exceed 45% of the week's volume — capped at ${cap.toFixed(1)}km. Consider adding a light 4th run to use the rest of this week's growth.`;
+      suggestedLong = cap;
+    }
+    if(suggestedLong < 0) suggestedLong = 0;
+
+    return {
+      total: suggestedTotal, long: suggestedLong, time: suggestedTimeMin, fixed: suggestedFixed,
+      index: nextIndex, isCutback, note
+    };
+  }
+
+  // ---------- render ----------
+  function render(){
+    const weeks = buildWeeks();
+    analyseWeeks(weeks);
+    const suggestion = suggestNextWeek(weeks);
+    const app = document.getElementById('app');
+
+    app.innerHTML = `
+      <div class="hero">
+        <div class="eyebrow">Return-to-running · build tracker</div>
+        <h1>Lap Log</h1>
+        <p>Log each run and this checks it against your plan's rules — the 10% growth rule, cutback weeks every 4th week, and keeping the long run under 45% of your week.</p>
+      </div>
+
+      <div class="card">
+        <h2>Log a run</h2>
+        <form id="run-form">
+          <div class="form-row">
+            <div class="field">
+              <label for="f-date">Date</label>
+              <input type="date" id="f-date" required>
+            </div>
+            <div class="field">
+              <label for="f-type">Run type</label>
+              <select id="f-type">
+                <option value="long">Long run</option>
+                <option value="time">Time-based run</option>
+                <option value="fixed">Fixed run</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" id="value-row">
+            <div class="field" id="km-field">
+              <label for="f-km">Distance (km)</label>
+              <input type="number" id="f-km" min="0" step="0.1" placeholder="e.g. 3.5">
+            </div>
+          </div>
+          <button type="submit" class="btn">Log run</button>
+        </form>
+      </div>
+
+      <div class="card next-week">
+        <h2>Suggested next week
+          <span class="sub">Week ${suggestion.index}${suggestion.isCutback ? ' — scheduled cutback' : ''}</span>
+        </h2>
+        <div class="nw-grid">
+          <div class="nw-item"><div class="val">${suggestion.total.toFixed(1)}<span class="mono" style="font-size:12px;">km</span></div><div class="lbl">Total volume</div></div>
+          <div class="nw-item"><div class="val">${suggestion.long.toFixed(1)}<span class="mono" style="font-size:12px;">km</span></div><div class="lbl">Long run</div></div>
+          <div class="nw-item"><div class="val">${suggestion.fixed.toFixed(1)}<span class="mono" style="font-size:12px;">km</span></div><div class="lbl">Fixed run</div></div>
+        </div>
+        <div class="nw-item" style="margin-bottom:12px;"><div class="val">${suggestion.time.toFixed(0)}<span class="mono" style="font-size:12px;"> min</span></div><div class="lbl">Time-based run</div></div>
+        ${suggestion.note ? `<div class="nw-note">${suggestion.note}</div>` : `<div class="nw-note">${suggestion.isCutback ? 'This week eases off ~25% to let tissue adapt — resist the urge to keep pushing.' : 'Standard ~10% growth from your last build week.'}</div>`}
+      </div>
+
+      <div class="card">
+        <h2>Weekly log</h2>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--track)"></span>Long</span>
+          <span><span class="swatch" style="background:var(--time)"></span>Time-based</span>
+          <span><span class="swatch" style="background:var(--fixed)"></span>Fixed</span>
+          <span><span class="swatch" style="background:var(--other)"></span>Other</span>
+        </div>
+        ${weeks.length === 0 ? '<div class="empty">No runs logged yet. Add your first run above.</div>' :
+          [...weeks].reverse().map(w => renderWeek(w)).join('')}
+      </div>
+
+      <div class="card">
+        <h2>All runs</h2>
+        ${runs.length === 0 ? '<div class="empty">Nothing logged yet.</div>' : `
+        <table>
+          <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th></th></tr></thead>
+          <tbody>
+            ${[...runs].sort((a,b)=> b.date.localeCompare(a.date)).map(r => `
+              <tr>
+                <td class="mono">${r.date}</td>
+                <td><span class="type-pill ${r.type}">${typeLabel(r.type)}</span></td>
+                <td class="num">${r.type==='time' ? r.minutes+' min' : r.km+' km'}</td>
+                <td style="text-align:right;"><button class="del" data-id="${r.id}" title="Delete">×</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`}
+      </div>
+    `;
+
+    // wire up
+    document.getElementById('f-date').valueAsDate = new Date();
+    document.getElementById('f-type').addEventListener('change', onTypeChange);
+    onTypeChange();
+    document.getElementById('run-form').addEventListener('submit', onSubmit);
+    document.querySelectorAll('.del').forEach(btn=>{
+      btn.addEventListener('click', ()=> deleteRun(btn.getAttribute('data-id')));
+    });
+  }
+
+  function typeLabel(t){
+    return { long:'Long', time:'Time-based', fixed:'Fixed', other:'Other' }[t] || t;
+  }
+
+  function renderWeek(w){
+    const segs = [
+      {cls:'long', v:w.long}, {cls:'time', v:w.time}, {cls:'fixed', v:w.fixed}, {cls:'other', v:w.other}
+    ];
+    const total = w.total || 1;
+    const laneHtml = segs.map(s => s.v>0 ? `<div class="seg ${s.cls}" style="width:${(s.v/total*100).toFixed(1)}%"></div>` : '').join('');
+    const flagsHtml = w.flags.map(f => `<div class="flag ${f.level}">${f.text}</div>`).join('');
+    return `
+      <div class="week">
+        <div class="week-head">
+          <div class="idx">WEEK <b>${w.index}</b> · from ${weekLabel(w.key)}${w.isScheduledCutback ? '<span class="tag cutback">Cutback</span>' : ''}</div>
+          <div class="total mono">${w.total.toFixed(1)} km</div>
+        </div>
+        <div class="lane ${w.isScheduledCutback ? 'is-cutback' : ''}">${laneHtml}</div>
+        ${flagsHtml ? `<div class="flags">${flagsHtml}</div>` : ''}
+      </div>
+    `;
+  }
+
+  function onTypeChange(){
+    const type = document.getElementById('f-type').value;
+    const row = document.getElementById('value-row');
+    if(type === 'time'){
+      row.innerHTML = `
+        <div class="field">
+          <label for="f-min">Duration (min)</label>
+          <input type="number" id="f-min" min="0" step="1" placeholder="e.g. 25">
+        </div>
+        <div class="field">
+          <label for="f-pace">Easy pace (min/km)</label>
+          <input type="number" id="f-pace" min="3" step="0.1" value="${editingPace}">
+        </div>
+      `;
+    } else {
+      row.innerHTML = `
+        <div class="field" id="km-field">
+          <label for="f-km">Distance (km)</label>
+          <input type="number" id="f-km" min="0" step="0.1" placeholder="e.g. 3.5">
+        </div>
+      `;
+    }
+  }
+
+  function onSubmit(e){
+    e.preventDefault();
+    const date = document.getElementById('f-date').value;
+    const type = document.getElementById('f-type').value;
+    if(!date) return;
+
+    let run = { id: 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), date, type };
+
+    if(type === 'time'){
+      const minutes = parseFloat(document.getElementById('f-min').value);
+      const pace = parseFloat(document.getElementById('f-pace').value) || DEFAULT_PACE;
+      if(!minutes || minutes<=0) return;
+      run.minutes = minutes;
+      run.pace = pace;
+      savePace(pace);
+    } else {
+      const km = parseFloat(document.getElementById('f-km').value);
+      if(!km || km<=0) return;
+      run.km = km;
+    }
+
+    runs.push(run);
+    saveRuns();
+    render();
+  }
+
+  function deleteRun(id){
+    runs = runs.filter(r => r.id !== id);
+    saveRuns();
+    render();
+  }
+
+  loadRuns();
+})();
+</script>
